@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EZ GameNews — Notícias de games sem enrolação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08080C;
+    --surface:#0F0F18;
+    --surface-2:#181826;
+    --border:#26263A;
+    --text:#F2F2F0;
+    --text-dim:#8C8CA6;
+    --blue:#3D8BFF;
+    --purple:#A855F7;
+
+    --cat-pc:#38BDF8;
+    --cat-console:#4C7EFF;
+    --cat-mobile:#A855F7;
+    --cat-esports:#7C3AED;
+    --cat-indie:#C084FC;
+
+    --font-pixel:'Press Start 2P', monospace;
+    --font-display:'Archivo Black', 'Inter', sans-serif;
+    --font-body:'Inter', sans-serif;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  ul{list-style:none;}
+  button{font-family:inherit;cursor:pointer;}
+
+  ::selection{background:var(--blue);color:#fff;}
+
+  :focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ============ TICKER ============ */
+  .ticker-bar{
+    background:#0A0A0D;
+    border-bottom:1px solid var(--border);
+    overflow:hidden;
+    white-space:nowrap;
+    position:relative;
+  }
+  .ticker-bar .wrap{
+    display:flex;
+    align-items:center;
+    padding:0;
+    max-width:100%;
+  }
+  .ticker-live{
+    flex:none;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--purple);
+    color:#fff;
+    font-family:var(--font-pixel);
+    font-size:9px;
+    padding:8px 14px;
+    z-index:2;
+  }
+  .ticker-live .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:#0F0F14;
+    animation:blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  .ticker-track-wrap{
+    overflow:hidden;
+    flex:1;
+    mask-image:linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  }
+  .ticker-track{
+    display:inline-flex;
+    gap:48px;
+    padding:9px 0;
+    animation:scroll-left 32s linear infinite;
+    font-size:12.5px;
+    color:var(--text-dim);
+  }
+  .ticker-track span{color:var(--blue);font-weight:600;margin-right:8px;}
+  @keyframes scroll-left{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{animation:none;}
+    .ticker-live .dot{animation:none;}
+  }
+
+  /* ============ HEADER ============ */
+  header{
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;
+    background:rgba(15,15,20,0.92);
+    backdrop-filter:blur(10px);
+    z-index:50;
+  }
+  .header-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 24px;
+    gap:24px;
+  }
+  .logo{
+    display:flex;
+    align-items:baseline;
+    gap:2px;
+    flex:none;
+  }
+  .logo .ez{
+    font-family:var(--font-pixel);
+    font-size:13px;
+    color:var(--bg);
+    background:var(--blue);
+    padding:5px 6px;
+    line-height:1;
+  }
+  .logo .gn{
+    font-family:var(--font-display);
+    font-size:22px;
+    letter-spacing:-0.5px;
+    padding-left:6px;
+  }
+
+  nav.main-nav{
+    display:flex;
+    gap:4px;
+    flex:1;
+    justify-content:center;
+  }
+  nav.main-nav a{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-dim);
+    padding:8px 12px;
+    border-radius:4px;
+    transition:color .15s ease, background .15s ease;
+    position:relative;
+  }
+  nav.main-nav a:hover, nav.main-nav a.active{
+    color:var(--text);
+    background:var(--surface-2);
+  }
+  nav.main-nav a.active::after{
+    content:"";
+    position:absolute;
+    left:12px;right:12px;bottom:2px;
+    height:2px;
+    background:var(--blue);
+  }
+
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex:none;
+  }
+  .search-box{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:7px 10px;
+    font-size:12.5px;
+    color:var(--text-dim);
+  }
+  .search-box svg{width:14px;height:14px;flex:none;}
+  .btn-signal{
+    font-family:var(--font-pixel);
+    font-size:9px;
+    background:var(--purple);
+    color:#fff;
+    padding:9px 12px;
+    border:none;
+    border-radius:4px;
+    white-space:nowrap;
+  }
+
+  @media (max-width:860px){
+    nav.main-nav{display:none;}
+    .search-box{display:none;}
+  }
+
+  /* ============ HERO ============ */
+  .hero-section{
+    padding:40px 0 32px;
+    border-bottom:1px solid var(--border);
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.6fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+  }
+
+  .hero-card{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:2px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .hero-art{
+    height:280px;
+    position:relative;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(61,139,255,0.18), transparent 55%),
+      radial-gradient(circle at 80% 70%, rgba(168,85,247,0.22), transparent 55%),
+      repeating-linear-gradient(115deg, #1a1a26 0 2px, #17171f 2px 44px);
+    overflow:hidden;
+  }
+  .hero-art::before{
+    content:"";
+    position:absolute;inset:0;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 3px);
+    pointer-events:none;
+  }
+  .hero-art .scan-line{
+    position:absolute;left:0;right:0;height:2px;
+    background:linear-gradient(90deg, transparent, var(--blue), transparent);
+    opacity:0.6;
+    animation:scan-move 4.5s ease-in-out infinite;
+  }
+  @keyframes scan-move{
+    0%,100%{top:8%;}
+    50%{top:88%;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-art .scan-line{animation:none;top:50%;}
+  }
+
+  .hero-body{
+    padding:24px 26px 28px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--font-pixel);
+    font-size:8.5px;
+    letter-spacing:0.5px;
+    padding:5px 8px;
+    border-radius:3px;
+    width:fit-content;
+  }
+  .tag::before{
+    content:"";
+    width:6px;height:6px;
+    background:currentColor;
+  }
+  .tag-pc{color:var(--cat-pc);background:rgba(56,189,248,0.12);}
+  .tag-console{color:var(--cat-console);background:rgba(61,139,255,0.12);}
+  .tag-mobile{color:var(--cat-mobile);background:rgba(168,85,247,0.12);}
+  .tag-esports{color:var(--cat-esports);background:rgba(124,58,237,0.12);}
+  .tag-indie{color:var(--cat-indie);background:rgba(192,132,252,0.12);}
+
+  .hero-title{
+    font-family:var(--font-display);
+    font-size:clamp(24px,3vw,34px);
+    line-height:1.12;
+    letter-spacing:-0.5px;
+  }
+  .hero-excerpt{
+    color:var(--text-dim);
+    font-size:14.5px;
+    max-width:56ch;
+  }
+  .meta-row{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    color:var(--text-dim);
+    font-size:12px;
+    margin-top:auto;
+    padding-top:6px;
+  }
+  .meta-row .sep{color:var(--border);}
+
+  /* selection-cursor bracket effect */
+  .bracketed{
+    position:relative;
+  }
+  .bracketed::before, .bracketed::after{
+    content:"";
+    position:absolute;
+    width:16px;height:16px;
+    border-color:var(--blue);
+    border-style:solid;
+    opacity:0;
+    transition:opacity .15s ease, transform .15s ease;
+    pointer-events:none;
+  }
+  .bracketed::before{
+    top:-1px;left:-1px;
+    border-width:2px 0 0 2px;
+    transform:translate(4px,4px);
+  }
+  .bracketed::after{
+    bottom:-1px;right:-1px;
+    border-width:0 2px 2px 0;
+    transform:translate(-4px,-4px);
+  }
+  .bracketed:hover::before, .bracketed:focus-within::before,
+  .bracketed:hover::after, .bracketed:focus-within::after{
+    opacity:1;
+    transform:translate(0,0);
+  }
+
+  /* ============ SIDE PANELS ============ */
+  .side-stack{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:2px;
+    padding:18px 20px;
+  }
+  .panel-title{
+    font-family:var(--font-pixel);
+    font-size:10px;
+    color:var(--blue);
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .panel-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--border);
+  }
+
+  .trend-item{
+    display:flex;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px solid var(--border);
+    font-size:13.5px;
+  }
+  .trend-item:last-child{border-bottom:none;padding-bottom:0;}
+  .trend-item:first-child{padding-top:0;}
+  .trend-rank{
+    font-family:var(--font-display);
+    font-size:16px;
+    color:var(--text-dim);
+    width:22px;
+    flex:none;
+  }
+  .trend-item:nth-child(1) .trend-rank{color:var(--blue);}
+  .trend-item a{transition:color .15s;}
+  .trend-item a:hover{color:var(--blue);}
+
+  .patch-item{
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .patch-item:last-child{border-bottom:none;padding-bottom:0;}
+  .patch-item:first-child{padding-top:0;}
+  .patch-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-bottom:4px;
+  }
+  .patch-ver{
+    font-family:var(--font-pixel);
+    font-size:9px;
+    color:var(--purple);
+  }
+  .patch-item p{font-size:13px;color:var(--text);}
+
+  /* ============ FILTER STRIP ============ */
+  .filter-strip{
+    padding:22px 0 4px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .filter-strip .label{
+    font-family:var(--font-pixel);
+    font-size:9px;
+    color:var(--text-dim);
+    margin-right:6px;
+  }
+  .chip{
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 13px;
+    border-radius:20px;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    background:transparent;
+    transition:all .15s ease;
+  }
+  .chip:hover{border-color:var(--text-dim);color:var(--text);}
+  .chip.active{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#fff;
+  }
+
+  /* ============ NEWS GRID ============ */
+  .news-section{padding:20px 0 56px;}
+  .news-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:18px;
+    margin-top:18px;
+  }
+  @media (max-width:900px){
+    .news-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:620px){
+    .news-grid{grid-template-columns:1fr;}
+  }
+
+  .news-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:2px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .news-card:hover{
+    border-color:#3A3A4C;
+    transform:translateY(-2px);
+  }
+  .news-card .thumb{
+    height:110px;
+    border-radius:2px;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 18px);
+  }
+  .thumb-pc{background-color:rgba(56,189,248,0.08);}
+  .thumb-console{background-color:rgba(61,139,255,0.08);}
+  .thumb-mobile{background-color:rgba(168,85,247,0.08);}
+  .thumb-esports{background-color:rgba(124,58,237,0.08);}
+  .thumb-indie{background-color:rgba(192,132,252,0.08);}
+
+  .news-card h3{
+    font-family:var(--font-display);
+    font-size:16.5px;
+    line-height:1.25;
+    letter-spacing:-0.2px;
+  }
+  .news-card p{
+    font-size:13px;
+    color:var(--text-dim);
+    flex:1;
+  }
+  .news-card .meta-row{font-size:11.5px;padding-top:2px;}
+
+  .news-card[hidden]{display:none;}
+
+  /* ============ NEWSLETTER ============ */
+  .newsletter{
+    border-top:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    background:var(--surface);
+    padding:40px 0;
+  }
+  .newsletter-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .newsletter h2{
+    font-family:var(--font-display);
+    font-size:22px;
+    margin-bottom:6px;
+  }
+  .newsletter p{color:var(--text-dim);font-size:13.5px;max-width:42ch;}
+  .newsletter-form{
+    display:flex;
+    gap:0;
+    flex:none;
+  }
+  .newsletter-form input{
+    font-family:var(--font-body);
+    font-size:13.5px;
+    padding:12px 14px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-right:none;
+    color:var(--text);
+    width:230px;
+  }
+  .newsletter-form input::placeholder{color:var(--text-dim);}
+  .newsletter-form button{
+    font-family:var(--font-pixel);
+    font-size:9px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    padding:0 18px;
+    white-space:nowrap;
+  }
+
+  /* ============ ADD ARTICLE ============ */
+  .btn-add{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:12.5px;
+    font-weight:700;
+    padding:8px 14px 8px 12px;
+    border-radius:20px;
+    border:1px dashed var(--blue);
+    color:var(--blue);
+    background:transparent;
+  }
+  .btn-add:hover{background:rgba(61,139,255,0.1);}
+  .btn-add svg{width:14px;height:14px;}
+
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(8,8,11,0.72);
+    backdrop-filter:blur(3px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:100;
+  }
+  .modal-overlay[hidden]{display:none;}
+
+  .modal-card{
+    width:100%;
+    max-width:480px;
+    max-height:90vh;
+    overflow-y:auto;
+    background:var(--surface);
+    border:1px solid var(--border);
+    position:relative;
+    padding:26px 26px 24px;
+  }
+  .modal-card::before, .modal-card::after{
+    content:"";
+    position:absolute;
+    width:18px;height:18px;
+    border-color:var(--blue);
+    border-style:solid;
+  }
+  .modal-card::before{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+  .modal-card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+
+  .modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .modal-head h2{
+    font-family:var(--font-display);
+    font-size:19px;
+  }
+  .modal-close{
+    background:none;border:none;color:var(--text-dim);
+    font-size:20px;line-height:1;padding:4px;
+  }
+  .modal-close:hover{color:var(--text);}
+
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-family:var(--font-pixel);
+    font-size:8.5px;
+    color:var(--text-dim);
+    margin-bottom:7px;
+    letter-spacing:0.4px;
+  }
+  .field input, .field select, .field textarea{
+    width:100%;
+    font-family:var(--font-body);
+    font-size:13.5px;
+    color:var(--text);
+    background:var(--bg);
+    border:1px solid var(--border);
+    padding:10px 12px;
+    resize:vertical;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:var(--blue);
+  }
+  .field-row{display:flex;gap:12px;}
+  .field-row .field{flex:1;}
+
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:6px;
+  }
+  .btn-ghost{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-dim);
+    background:none;
+    border:1px solid var(--border);
+    padding:10px 16px;
+  }
+  .btn-ghost:hover{color:var(--text);}
+  .btn-publish{
+    font-family:var(--font-pixel);
+    font-size:9px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    padding:0 18px;
+  }
+  .btn-publish:disabled{opacity:0.5;}
+
+  .form-msg{
+    font-size:12px;
+    margin-top:10px;
+    min-height:16px;
+  }
+  .form-msg.error{color:var(--purple);}
+  .form-msg.ok{color:var(--blue);}
+
+  .news-card.user-added{border-color:var(--blue);}
+  .card-remove{
+    align-self:flex-start;
+    font-size:11px;
+    color:var(--text-dim);
+    background:none;
+    border:none;
+    padding:0;
+    margin-top:-4px;
+  }
+  .card-remove:hover{color:var(--purple);}
+
+  /* ============ FOOTER ============ */
+  footer{padding:36px 0 40px;}
+  .footer-grid{
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    flex-wrap:wrap;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:18px;
+  }
+  .footer-cols{
+    display:flex;
+    gap:56px;
+    flex-wrap:wrap;
+  }
+  .footer-col h4{
+    font-family:var(--font-pixel);
+    font-size:9px;
+    color:var(--text-dim);
+    margin-bottom:12px;
+  }
+  .footer-col a{
+    display:block;
+    font-size:13px;
+    color:var(--text);
+    padding:5px 0;
+    opacity:0.85;
+  }
+  .footer-col a:hover{color:var(--blue);opacity:1;}
+  .footer-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    font-size:12px;
+    color:var(--text-dim);
+  }
+</style>
+</head>
+<body>
+
+  <!-- TICKER -->
+  <div class="ticker-bar">
+    <div class="wrap">
+      <div class="ticker-live"><span class="dot"></span>AO VIVO</div>
+      <div class="ticker-track-wrap">
+        <div class="ticker-track" id="tickerTrack">
+          <!-- duplicated via JS for seamless loop -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <a href="#top" class="logo">
+        <span class="ez">EZ</span><span class="gn">GameNews</span>
+      </a>
+      <nav class="main-nav">
+        <a href="#top" class="active">Início</a>
+        <a href="#" data-filter="pc">PC</a>
+        <a href="#" data-filter="console">Consoles</a>
+        <a href="#" data-filter="mobile">Mobile</a>
+        <a href="#" data-filter="esports">eSports</a>
+        <a href="#" data-filter="indie">Indie</a>
+      </nav>
+      <div class="header-actions">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          Buscar notícia…
+        </div>
+        <button class="btn-signal">SEGUIR</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero-section">
+      <div class="wrap hero-grid">
+        <article class="hero-card bracketed">
+          <div class="hero-art"><div class="scan-line"></div></div>
+          <div class="hero-body">
+            <span class="tag tag-console">DESTAQUE</span>
+            <h1 class="hero-title">Runebound Isles adia lançamento pela 2ª vez — estúdio promete "valer a espera"</h1>
+            <p class="hero-excerpt">A Tidegate Studios confirmou que o RPG de mundo aberto sai em março, alegando ajustes no sistema de combate após feedback do beta fechado. Comunidade reage dividida nas redes.</p>
+            <div class="meta-row">
+              <span>Por Marina Kael</span><span class="sep">•</span><span>há 12 min</span><span class="sep">•</span><span>6 min de leitura</span>
+            </div>
+          </div>
+        </article>
+
+        <div class="side-stack">
+          <div class="panel">
+            <div class="panel-title">EM ALTA</div>
+            <div class="trend-item"><span class="trend-rank">01</span><a href="#">Neon Drift bate 2 milhões de jogadores no lançamento</a></div>
+            <div class="trend-item"><span class="trend-rank">02</span><a href="#">Vazamento sugere remaster de Hollow Circuit</a></div>
+            <div class="trend-item"><span class="trend-rank">03</span><a href="#">Campeonato mundial de Starfall Chronicles anunciado</a></div>
+            <div class="trend-item"><span class="trend-rank">04</span><a href="#">Novo controle adaptativo chega em outubro</a></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">PATCH NOTES</div>
+            <div class="patch-item">
+              <div class="patch-head"><span>Starfall Chronicles</span><span class="patch-ver">v2.4.1</span></div>
+              <p>Corrige queda de FPS em áreas urbanas e reequilibra dano de armas de energia.</p>
+            </div>
+            <div class="patch-item">
+              <div class="patch-head"><span>Neon Drift</span><span class="patch-ver">v1.1.0</span></div>
+              <p>Novo modo fotografia e correção de bug que travava replays online.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER + GRID -->
+    <section class="news-section">
+      <div class="wrap">
+        <div class="filter-strip">
+          <span class="label">FILTRAR</span>
+          <button class="chip active" data-filter="all">Tudo</button>
+          <button class="chip" data-filter="pc">PC</button>
+          <button class="chip" data-filter="console">Consoles</button>
+          <button class="chip" data-filter="mobile">Mobile</button>
+          <button class="chip" data-filter="esports">eSports</button>
+          <button class="chip" data-filter="indie">Indie</button>
+          <button class="btn-add" id="openAddArticle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Nova matéria
+          </button>
+        </div>
+
+        <div class="news-grid" id="newsGrid">
+
+          <article class="news-card" data-cat="pc">
+            <div class="thumb thumb-pc"></div>
+            <span class="tag tag-pc">PC</span>
+            <h3>Requisitos de Ironvale Online assustam quem tem PC de 2019</h3>
+            <p>Desenvolvedora responde críticas e promete modo de otimização "econômico" antes do lançamento.</p>
+            <div class="meta-row"><span>há 40 min</span><span class="sep">•</span><span>4 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="esports">
+            <div class="thumb thumb-esports"></div>
+            <span class="tag tag-esports">ESPORTS</span>
+            <h3>Time brasileiro Fenix Row vence etapa regional de Starfall Chronicles</h3>
+            <p>Vitória de virada garante vaga direta no mundial marcado para dezembro.</p>
+            <div class="meta-row"><span>há 1h</span><span class="sep">•</span><span>3 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="indie">
+            <div class="thumb thumb-indie"></div>
+            <span class="tag tag-indie">INDIE</span>
+            <h3>Feito por 3 pessoas, Paper Orbit vira fenômeno inesperado</h3>
+            <p>Jogo de quebra-cabeça gravitacional passa de 500 mil cópias vendidas em uma semana.</p>
+            <div class="meta-row"><span>há 2h</span><span class="sep">•</span><span>5 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="mobile">
+            <div class="thumb thumb-mobile"></div>
+            <span class="tag tag-mobile">MOBILE</span>
+            <h3>Tap Legends anuncia crossplay com versão de console</h3>
+            <p>Progresso de conta será unificado entre celular e console a partir da próxima atualização.</p>
+            <div class="meta-row"><span>há 3h</span><span class="sep">•</span><span>3 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="console">
+            <div class="thumb thumb-console"></div>
+            <span class="tag tag-console">CONSOLE</span>
+            <h3>Novo controle adaptativo promete reduzir fadiga em maratonas</h3>
+            <p>Fabricante detalha gatilhos ajustáveis e bateria de 40 horas em modo econômico.</p>
+            <div class="meta-row"><span>há 3h</span><span class="sep">•</span><span>4 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="pc">
+            <div class="thumb thumb-pc"></div>
+            <span class="tag tag-pc">PC</span>
+            <h3>Mod que traduz Hollow Circuit para PT-BR ultrapassa 1 milhão de downloads</h3>
+            <p>Equipe de fãs trabalha há 2 anos no projeto e agora negocia parceria oficial com a desenvolvedora.</p>
+            <div class="meta-row"><span>há 4h</span><span class="sep">•</span><span>5 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="indie">
+            <div class="thumb thumb-indie"></div>
+            <span class="tag tag-indie">INDIE</span>
+            <h3>Estúdio brasileiro anuncia Cerrado Nocturne, RPG ambientado no interior de Goiás</h3>
+            <p>Trailer de anúncio mistura folclore regional com estética synthwave.</p>
+            <div class="meta-row"><span>há 5h</span><span class="sep">•</span><span>4 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="esports">
+            <div class="thumb thumb-esports"></div>
+            <span class="tag tag-esports">ESPORTS</span>
+            <h3>Organizadores de mundial de Neon Drift revelam premiação recorde</h3>
+            <p>Bolsa total passa de R$ 5 milhões, maior valor já anunciado no cenário competitivo do jogo.</p>
+            <div class="meta-row"><span>há 6h</span><span class="sep">•</span><span>3 min</span></div>
+          </article>
+
+          <article class="news-card" data-cat="mobile">
+            <div class="thumb thumb-mobile"></div>
+            <span class="tag tag-mobile">MOBILE</span>
+            <h3>Golpes com skins falsas de Tap Legends fazem nova vítima</h3>
+            <p>Desenvolvedora reforça que nunca pede senha por chat e recomenda autenticação em duas etapas.</p>
+            <div class="meta-row"><span>há 7h</span><span class="sep">•</span><span>3 min</span></div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER -->
+    <section class="newsletter">
+      <div class="wrap newsletter-inner">
+        <div>
+          <h2>Receba o resumo do dia</h2>
+          <p>Um e-mail curto, direto ao ponto, sem spoiler de review — só o que importa no mundo dos games.</p>
+        </div>
+        <form class="newsletter-form" onsubmit="return false;">
+          <input type="email" placeholder="seu@email.com" aria-label="Seu e-mail" required>
+          <button type="submit">INSCREVER</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: NOVA MATÉRIA -->
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h2 id="modalTitle">Publicar matéria</h2>
+        <button class="modal-close" id="closeAddArticle" aria-label="Fechar">✕</button>
+      </div>
+      <form id="articleForm">
+        <div class="field">
+          <label for="f-title">Título</label>
+          <input id="f-title" type="text" maxlength="120" required placeholder="Ex: Novo trailer de Starfall Chronicles é anunciado">
+        </div>
+        <div class="field">
+          <label for="f-excerpt">Resumo</label>
+          <textarea id="f-excerpt" rows="3" maxlength="220" required placeholder="Um resumo curto da notícia, direto ao ponto."></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-cat">Categoria</label>
+            <select id="f-cat">
+              <option value="pc">PC</option>
+              <option value="console">Console</option>
+              <option value="mobile">Mobile</option>
+              <option value="esports">eSports</option>
+              <option value="indie">Indie</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-author">Autor</label>
+            <input id="f-author" type="text" maxlength="40" placeholder="Seu nome">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="cancelAddArticle">Cancelar</button>
+          <button type="submit" class="btn-publish" id="publishBtn">PUBLICAR</button>
+        </div>
+        <div class="form-msg" id="formMsg"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-grid">
+        <a href="#top" class="logo">
+          <span class="ez">EZ</span><span class="gn">GameNews</span>
+        </a>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h4>SEÇÕES</h4>
+            <a href="#">PC</a>
+            <a href="#">Consoles</a>
+            <a href="#">Mobile</a>
+            <a href="#">eSports</a>
+            <a href="#">Indie</a>
+          </div>
+          <div class="footer-col">
+            <h4>PORTAL</h4>
+            <a href="#">Sobre</a>
+            <a href="#">Contato</a>
+            <a href="#">Anuncie</a>
+            <a href="#">Trabalhe conosco</a>
+          </div>
+          <div class="footer-col">
+            <h4>SIGA</h4>
+            <a href="#">Twitter/X</a>
+            <a href="#">Discord</a>
+            <a href="#">YouTube</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 EZ GameNews. Todos os direitos reservados.</span>
+        <span>Feito por quem joga.</span>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  // Ticker: build items then duplicate for seamless scroll
+  const tickerItems = [
+    "Runebound Isles adia lançamento para março",
+    "Neon Drift ultrapassa 2 milhões de jogadores",
+    "Fenix Row vence etapa regional de Starfall Chronicles",
+    "Vazamento aponta remaster de Hollow Circuit",
+    "Mundial de Neon Drift terá premiação recorde",
+    "Tap Legends anuncia crossplay com consoles"
+  ];
+  const track = document.getElementById('tickerTrack');
+  function renderTicker(){
+    track.innerHTML = '';
+    for(let i=0;i<2;i++){
+      tickerItems.forEach(text=>{
+        const el = document.createElement('span');
+        el.innerHTML = '<span>▸</span>' + text;
+        track.appendChild(el);
+      });
+    }
+  }
+  renderTicker();
+
+  // Filtering
+  const chips = document.querySelectorAll('.chip, [data-filter]');
+  const cards = document.querySelectorAll('.news-card');
+  function applyFilter(filter){
+    document.querySelectorAll('.chip').forEach(c=>{
+      c.classList.toggle('active', c.dataset.filter === filter);
+    });
+    cards.forEach(card=>{
+      card.hidden = !(filter === 'all' || card.dataset.cat === filter);
+    });
+  }
+  document.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=> applyFilter(chip.dataset.filter));
+  });
+  document.querySelectorAll('nav.main-nav [data-filter]').forEach(link=>{
+    link.addEventListener('click', (e)=>{
+      e.preventDefault();
+      applyFilter(link.dataset.filter);
+      document.getElementById('newsGrid').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // ============ ADD ARTICLE (persisted with window.storage) ============
+  const CAT_LABEL = {pc:'PC', console:'CONSOLE', mobile:'MOBILE', esports:'ESPORTS', indie:'INDIE'};
+  const STORAGE_KEY = 'ez-gamenews-user-articles';
+  const grid = document.getElementById('newsGrid');
+  const overlay = document.getElementById('modalOverlay');
+  const form = document.getElementById('articleForm');
+  const formMsg = document.getElementById('formMsg');
+  const publishBtn = document.getElementById('publishBtn');
+
+  function openModal(){
+    overlay.hidden = false;
+    formMsg.textContent = '';
+    formMsg.className = 'form-msg';
+    document.getElementById('f-title').focus();
+  }
+  function closeModal(){
+    overlay.hidden = true;
+    form.reset();
+  }
+  document.getElementById('openAddArticle').addEventListener('click', openModal);
+  document.getElementById('closeAddArticle').addEventListener('click', closeModal);
+  document.getElementById('cancelAddArticle').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && !overlay.hidden) closeModal(); });
+
+  function timeAgoLabel(){ return 'agora mesmo'; }
+
+  function buildCardEl(article){
+    const card = document.createElement('article');
+    card.className = 'news-card user-added';
+    card.dataset.cat = article.cat;
+    card.innerHTML = `
+      <div class="thumb thumb-${article.cat}"></div>
+      <span class="tag tag-${article.cat}">${CAT_LABEL[article.cat]}</span>
+      <h3>${article.title}</h3>
+      <p>${article.excerpt}</p>
+      <div class="meta-row">
+        <span>${article.author ? 'Por ' + article.author : 'Comunidade'}</span><span class="sep">•</span><span>${article.timeLabel}</span>
+      </div>
+      <button class="card-remove" data-id="${article.id}">Remover</button>
+    `;
+    card.querySelector('.card-remove').addEventListener('click', ()=> removeArticle(article.id));
+    return card;
+  }
+
+  function renderUserArticles(list){
+    list.slice().reverse().forEach(article=>{
+      grid.prepend(buildCardEl(article));
+    });
+  }
+
+  async function loadUserArticles(){
+    try{
+      const result = await window.storage.get(STORAGE_KEY, true);
+      const list = result ? JSON.parse(result.value) : [];
+      renderUserArticles(list);
+    }catch(err){
+      // no articles saved yet, or storage unavailable — start empty
+      console.log('Nenhuma matéria salva ainda.');
+    }
+  }
+
+  async function saveUserArticles(list){
+    await window.storage.set(STORAGE_KEY, JSON.stringify(list), true);
+  }
+
+  async function getUserArticles(){
+    try{
+      const result = await window.storage.get(STORAGE_KEY, true);
+      return result ? JSON.parse(result.value) : [];
+    }catch(err){
+      return [];
+    }
+  }
+
+  async function removeArticle(id){
+    try{
+      const list = await getUserArticles();
+      const next = list.filter(a => a.id !== id);
+      await saveUserArticles(next);
+      document.querySelector(`.card-remove[data-id="${id}"]`).closest('.news-card').remove();
+    }catch(err){
+      alert('Não foi possível remover a matéria agora.');
+    }
+  }
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const title = document.getElementById('f-title').value.trim();
+    const excerpt = document.getElementById('f-excerpt').value.trim();
+    const cat = document.getElementById('f-cat').value;
+    const author = document.getElementById('f-author').value.trim();
+
+    if(!title || !excerpt){
+      formMsg.textContent = 'Preencha título e resumo.';
+      formMsg.className = 'form-msg error';
+      return;
+    }
+
+    const article = {
+      id: 'a' + Date.now(),
+      title, excerpt, cat, author,
+      timeLabel: timeAgoLabel()
+    };
+
+    publishBtn.disabled = true;
+    publishBtn.textContent = 'PUBLICANDO…';
+
+    try{
+      const list = await getUserArticles();
+      list.push(article);
+      await saveUserArticles(list);
+      grid.prepend(buildCardEl(article));
+      applyFilter(document.querySelector('.chip.active')?.dataset.filter || 'all');
+      formMsg.textContent = 'Matéria publicada!';
+      formMsg.className = 'form-msg ok';
+      setTimeout(closeModal, 700);
+    }catch(err){
+      formMsg.textContent = 'Não foi possível salvar agora. Tente de novo.';
+      formMsg.className = 'form-msg error';
+    }finally{
+      publishBtn.disabled = false;
+      publishBtn.textContent = 'PUBLICAR';
+    }
+  });
+
+  loadUserArticles();
+</script>
+
+</body>
+</html>
